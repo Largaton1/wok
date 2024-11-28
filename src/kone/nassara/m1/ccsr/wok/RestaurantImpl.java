@@ -10,6 +10,43 @@ public class RestaurantImpl implements Restaurant {
 
     private static final int MAX_SEATS = 25; // Nombre maximum de places disponibles
     private int availableSeats = MAX_SEATS; // Nombre de places actuellement disponibles
+    /**
+* Le volume maximal des compartiments en grammes (g).
+*/
+private static final int MAX_COMPARTS_VOLUME = 1000;
+
+/**
+* Le volume minimal des compartiments en grammes (g).
+*/
+private static final int MIN_COMPARTS_VOLUME = 100;
+
+/**
+* Le volume actuel du compartiment à poissons, initialisé au volume maximal.
+*/
+private int fishCOMPART = MAX_COMPARTS_VOLUME;
+
+private boolean shouldEmployeeIdle = true;
+
+/**
+* Le volume actuel du compartiment à nouilles, initialisé au volume maximal.
+*/
+private int noodleCOMPART = MAX_COMPARTS_VOLUME;
+
+/**
+* Le volume actuel du compartiment à viande, initialisé au volume maximal.
+*/
+private int meatCOMPART = MAX_COMPARTS_VOLUME;
+
+/**
+* Le volume actuel du compartiment à légumes, initialisé au volume maximal.
+*/
+private int vegetableCOMPART = MAX_COMPARTS_VOLUME;
+
+/**
+* Le nombre total de clients présents dans le restaurant.
+* Est initialisé à {@code 0}.
+*/
+private int clientsCount;
 
     private final Object seatLock = new Object(); // Pour synchroniser l'entrée et la sortie
     private final Object buffetLock = new Object(); // Pour synchroniser l'accès au buffet
