@@ -48,13 +48,25 @@ private int vegetableCOMPART = MAX_COMPARTS_VOLUME;
 */
 private int clientsCount;
 
-    private final Object seatLock = new Object(); // Pour synchroniser l'entrée et la sortie
+    private final Object seatLock = new Object(); // Pour synchroniser l'entrée et la sortie = verrou 
     private final Object buffetLock = new Object(); // Pour synchroniser l'accès au buffet
     private final Object cookingLock = new Object(); // Pour synchroniser la cuisson
 
     private final Buffet buffet = new Buffet(); // L'objet Buffet gère les compartiments
     private final Queue<Client> cookingQueue = new LinkedList<>(); // File d'attente pour la cuisson
 
+    public int getVegetableCOMPART() {return vegetableCOMPART;}
+    public void setVegetableCOMPART(int vegetableCOMPART) { this.vegetableCOMPART = vegetableCOMPART;}
+    public int getFishCOMPART() {return fishCOMPART;}
+    public void setFishCOMPART(int fishCOMPART) { this.fishCOMPART = fishCOMPART; }
+    public boolean isShouldEmployeeIdle() {return shouldEmployeeIdle;}
+    public void setShouldEmployeeIdle(boolean shouldEmployeeIdle) {this.shouldEmployeeIdle = shouldEmployeeIdle;}
+    public int getNoodleCOMPART() {return noodleCOMPART;}
+    public void setNoodleCOMPART(int noodleCOMPART) {this.noodleCOMPART = noodleCOMPART;}
+    public int getMeatCOMPART() {return meatCOMPART;}
+    public void setMeatCOMPART(int meatCOMPART) {this.meatCOMPART = meatCOMPART;}
+    public int getClientsCount() {return clientsCount;}
+    public void setClientsCount(int clientsCount) { this.clientsCount = clientsCount;}
     @Override
     public void entrer(Client client) {
         synchronized (seatLock) {
@@ -157,7 +169,7 @@ private int clientsCount;
 
     @Override
     public String etatBuffet() {
-        synchronized (buffetLock) {
+        synchronized (buffetLock) { 
             StringBuilder state = new StringBuilder("État du buffet :\n");
             for (int i = 0; i < 4; i++) {
                 state.append("Compartiment ").append(i)
@@ -166,4 +178,5 @@ private int clientsCount;
             return state.toString();
         }
     }
+
 }
