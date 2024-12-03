@@ -2,9 +2,11 @@ package kone.nassara.m1.ccsr.wok;
 
 public class Cuisinier extends Thread {
     private final StandCuisson standCuisson;
+    private final Restaurant restaurant;
 
-    public Cuisinier(StandCuisson standCuisson) {
+    public Cuisinier(StandCuisson standCuisson, Restaurant restaurant) {
         this.standCuisson = standCuisson;
+        this.restaurant = restaurant;
     }
 
     @Override
@@ -12,15 +14,16 @@ public class Cuisinier extends Thread {
         try {
             while (true) {
                 Client client = standCuisson.prochainClient();
-                System.out.println("Cuisinier commence à cuire pour le client " + client.getClientId());
+                Logger.log("Cuisinier commence à cuire pour le client " + client.getClientId());
                 Thread.sleep(500 + (int) (Math.random() * 500)); // Temps de cuisson aléatoire
                 synchronized (client) {
-                    client.notify();
+                    client.notify(); // Notifie que la cuisson est terminée
                 }
-                System.out.println("Plat du client " + client.getClientId() + " est prêt !");
+                Logger.log("Plat du client " + client.getClientId() + " est prêt !");
+                restaurant.incrementerPlatsCuits(); // Incrémenter le nombre de plats cuits
             }
         } catch (InterruptedException e) {
-            System.out.println("Cuisinier interrompu.");
+            Logger.log("Cuisinier interrompu.");
         }
     }
 }

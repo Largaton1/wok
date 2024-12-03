@@ -10,7 +10,7 @@ public class StandCuisson {
         try {
             fileCuisson.put(client);
         } catch (InterruptedException e) {
-            System.err.println("Erreur lors de l'ajout du client au stand de cuisson.");
+            Logger.log("Erreur lors de l'ajout du client au stand de cuisson.");
         }
     }
 
