@@ -1,45 +1,22 @@
 package kone.nassara.m1.ccsr.wok;
 
 public class Buffet {
-    private static final int MAX_QUANTITY = 1000; // Capacité maximale de chaque compartiment (1 kg)
-    private final int[] quantites = {MAX_QUANTITY, MAX_QUANTITY, MAX_QUANTITY, MAX_QUANTITY}; // Poisson, viande, légumes, nouilles
+    private static final int CAPACITY = 1000;
+    private final int[] compartiments = {CAPACITY, CAPACITY, CAPACITY, CAPACITY};
 
-    // Enumération pour identifier les compartiments
-    public enum Compartiment {
-        POISSON(0), VIANDE(1), LEGUMES(2), NOUILLES(3);
-
-        private final int index;
-
-        Compartiment(int index) {
-            this.index = index;
-        }
-
-        public int getIndex() {
-            return index;
-        }
-    }
-
-    // Servir une portion d'un compartiment
-    public synchronized boolean serve(Compartiment compartiment, int amount) {
-        int index = compartiment.getIndex();
-        if (quantites[index] >= amount) {
-            quantites[index] -= amount;
-            System.out.println("Servi " + amount + "g du compartiment " + compartiment + ". Restant : " + quantites[index] + "g.");
+    public synchronized boolean servir(int index, int quantite) {
+        if (compartiments[index] >= quantite) {
+            compartiments[index] -= quantite;
             return true;
         }
-        System.out.println("Quantité insuffisante dans le compartiment " + compartiment + ". Restant : " + quantites[index] + "g.");
         return false;
     }
 
-    // Réapprovisionner un compartiment
-    public synchronized void refill(Compartiment compartiment) {
-        int index = compartiment.getIndex();
-        quantites[index] = MAX_QUANTITY;
-        System.out.println("Compartiment " + compartiment + " réapprovisionné à " + MAX_QUANTITY + "g.");
+    public synchronized void recharger(int index) {
+        compartiments[index] = CAPACITY;
     }
 
-    // Obtenir la quantité restante dans un compartiment
-    public synchronized int getQuantity(Compartiment compartiment) {
-        return quantites[compartiment.getIndex()];
+    public synchronized int getQuantite(int index) {
+        return compartiments[index];
     }
 }

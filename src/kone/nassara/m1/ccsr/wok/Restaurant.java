@@ -1,63 +1,53 @@
 package kone.nassara.m1.ccsr.wok;
 
-/**
- * Représente les fonctionnalités principales d'un restaurant simulé.
- */
-public interface Restaurant {
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
-    /**
-     * Un client entre dans le restaurant. Si le restaurant est plein, le client attend qu'une place se libère.
-     *
-     * @param client Le client qui tente d'entrer.
-     */
-    void entrer(Client client);
+public class Restaurant {
+    private final int CAPACITE_MAX = 25;
+    private int placesOccupees = 0;
+    private final Buffet buffet = new Buffet();
+    private final StandCuisson standCuisson = new StandCuisson();
+    private final Cuisinier cuisinier = new Cuisinier(standCuisson);
+    private final EmployeBuffet employeBuffet = new EmployeBuffet(buffet);
+    private final BlockingQueue<Client> fileAttente = new LinkedBlockingQueue<>();
 
-    /**
-     * Un client quitte le restaurant, libérant une place.
-     *
-     * @param client Le client qui quitte le restaurant.
-     */
-    void sortir(Client client);
+    public void startSimulation(int nbClients) {
+        // D�marrer les employ�s
+        new Thread(employeBuffet).start();
+        cuisinier.start();
 
-    /**
-     * Un client accède au buffet pour se servir.
-     * Cette méthode garantit la sécurité des threads pendant l'accès et gère l'attente
-     * si un compartiment est vide.
-     *
-     * @param client Le client qui se sert au buffet.
-     */
-    void servirAuBuffet(Client client);
+        // Cr�er et d�marrer les clients
+        for (int i = 1; i <= nbClients; i++) {
+            Client client = new Client(i, this);
+            new Thread(client).start();
+        }
+    }
 
-    /**
-     * Surveille et réapprovisionne les compartiments du buffet si nécessaire.
-     * Cette méthode est appelée par l'employé chargé du buffet.
-     */
-    void surveillerEtReapprovisionnerBuffet();
+    public synchronized void entrer(Client client) throws InterruptedException {
+        while (placesOccupees >= CAPACITE_MAX) {
+            System.out.println("Client " + client.getClientId() + " attend une place...");
+            wait();
+        }
+        placesOccupees++;
+        System.out.println("Client " + client.getClientId() + " entre dans le restaurant.");
+    }
 
-    /**
-     * Un client s'inscrit dans la file d'attente pour la cuisson et attend son tour.
-     *
-     * @param client Le client en attente de cuisson.
-     */
-    void attendreCuisson(Client client);
+    public synchronized void sortir(Client client) {
+        placesOccupees--;
+        System.out.println("Client " + client.getClientId() + " quitte le restaurant.");
+        notifyAll(); // Lib�rer une place pour un autre client
+    }
 
-    /**
-     * Le cuisinier prépare le plat du prochain client dans la file d'attente.
-     * Cette méthode est appelée par le thread du cuisinier.
-     */
-    void cuireProchainClient();
+    public Buffet getBuffet() {
+        return buffet;
+    }
 
-    /**
-     * Renvoie l'état actuel du restaurant, comme le nombre de places occupées.
-     *
-     * @return Une chaîne de caractères ou une structure résumant l'état du restaurant.
-     */
-    String etatRestaurant();
+    public StandCuisson getStandCuisson() {
+        return standCuisson;
+    }
 
-    /**
-     * Renvoie l'état actuel du buffet, y compris les quantités restantes dans chaque compartiment.
-     *
-     * @return Une chaîne de caractères ou une structure résumant l'état du buffet.
-     */
-    String etatBuffet();
+    public Cuisinier getCuisinier() {
+        return cuisinier;
+    }
 }
