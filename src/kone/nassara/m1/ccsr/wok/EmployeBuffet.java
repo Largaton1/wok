@@ -12,7 +12,7 @@ public class EmployeBuffet implements Runnable {
     @Override
     public void run() {
         try {
-            while (!Thread.currentThread().isInterrupted()) { // Vérification explicite de l'interruption
+            while (true) {
                 for (Compartiment compartiment : Compartiment.values()) {
                     if (buffet.getQuantite(compartiment) < 100) {
                         buffet.recharger(compartiment);
@@ -21,9 +21,7 @@ public class EmployeBuffet implements Runnable {
                 Thread.sleep(delai); // Pause configurable entre les vérifications
             }
         } catch (InterruptedException e) {
-            // Gestion explicite de l'interruption
             Logger.log("Employé interrompu.");
-            Thread.currentThread().interrupt(); // Restaure l'état d'interruption
         }
     }
 }

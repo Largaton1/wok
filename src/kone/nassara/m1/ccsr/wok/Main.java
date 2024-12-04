@@ -7,7 +7,6 @@ public class Main {
         // Démarre la simulation avec 40 clients
         restaurant.startSimulation(40);
 
-        // Attendre que tous les clients et le cuisinier finissent
-        restaurant.attendreFinSimulation();
+       
     }
 }

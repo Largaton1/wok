@@ -12,27 +12,21 @@ public class Cuisinier extends Thread {
     @Override
     public void run() {
         try {
-            while (!Thread.currentThread().isInterrupted()) { // Vérifier l'état d'interruption
+            while (!Thread.currentThread().isInterrupted()) {
                 Client client = standCuisson.prochainClient();
                 Logger.log("Cuisinier commence à cuire pour le client " + client.getClientId());
-
-                // Temps de cuisson simulé
-                Thread.sleep(500 + (int) (Math.random() * 500));
-
-                // Si l'interruption se produit pendant le sommeil, sortir de la boucle
-                if (Thread.currentThread().isInterrupted()) {
-                    Logger.log("Cuisinier interrompu pendant la cuisson.");
-                    break;  // Sortir de la boucle si l'interruption est détectée
-                }
+                Thread.sleep(500 + (int) (Math.random() * 500)); // Temps de cuisson simulé
 
                 synchronized (client) {
                     client.notify(); // Notifie que la cuisson est terminée
                 }
+
                 Logger.log("Plat du client " + client.getClientId() + " est prêt !");
                 restaurant.incrementerPlatsCuits(); // Incrémenter le nombre de plats cuits
             }
         } catch (InterruptedException e) {
             Logger.log("Cuisinier interrompu.");
+            Thread.currentThread().interrupt();  // Restaure l'état d'interruption
         }
     }
 }

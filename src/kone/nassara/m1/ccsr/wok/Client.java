@@ -13,17 +13,16 @@ public class Client extends Thread {
     public void run() {
         try {
             // Entrer dans le restaurant
-            System.out.println("Client " + clientId + " entre dans le restaurant.");
+            restaurant.entrer(this);  // Attente si le restaurant est plein
 
-            // Choisir un compartiment et se servir (simulé ici)
+            // Choisir un compartiment et se servir
             Compartiment[] compartiments = Compartiment.values();
             Compartiment compartimentChoisi = compartiments[(int) (Math.random() * compartiments.length)];
-
             System.out.println("Client " + clientId + " se sert dans " + compartimentChoisi + ".");
 
             // Simule la consommation
             int quantite = 200;  // Quantité consommée par client (par exemple, 200g)
-            restaurant.consommer(compartimentChoisi, quantite);
+            restaurant.consommer(compartimentChoisi, quantite);  // Met à jour la consommation totale
 
             // Attente de la cuisson
             restaurant.getStandCuisson().ajouterClient(this);
@@ -34,12 +33,18 @@ public class Client extends Thread {
             // Manger
             System.out.println("Client " + clientId + " mange.");
 
+            // Incrémenter le nombre de plats cuits
+            restaurant.incrementerPlatsCuits();
+
             // Quitter le restaurant
+            restaurant.sortir(this);  // Libère une place pour un autre client
             System.out.println("Client " + clientId + " quitte le restaurant.");
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
+
 
     public int getClientId() {
         return clientId;
