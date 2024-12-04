@@ -1,77 +1,89 @@
 package kone.nassara.m1.ccsr.wok;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Restaurant {
-    private final int CAPACITE_MAX = 25;
-    private int placesOccupees = 0;
-    private final Buffet buffet = new Buffet();
+    private final List<Client> clients = new ArrayList<>();
     private final StandCuisson standCuisson = new StandCuisson();
     private final Cuisinier cuisinier = new Cuisinier(standCuisson, this);
-    private final BlockingQueue<Client> clientsDansRestaurant = new LinkedBlockingQueue<>();
-    private final EmployeBuffet employeBuffet = new EmployeBuffet(buffet, 1000);
-    private final ExecutorService poolClients = Executors.newFixedThreadPool(10);
 
-    // MÉTRIQUES
-    private final AtomicInteger totalPlatsCuits = new AtomicInteger(0);
-    private long totalTempsAttenteBuffet = 0;
-    private int totalClients = 0;
+    private int totalPlatsCuits = 0;  // Compteur des plats cuits
+    private int totalLegumes = 0;     // Consommation totale de légumes
+    private int totalViande = 0;      // Consommation totale de viande
+    private int totalPoisson = 0;     // Consommation totale de poisson
+    private int totalNouilles = 0;    // Consommation totale de nouilles
 
+    // Démarre la simulation avec un nombre de clients
     public void startSimulation(int nbClients) {
-        totalClients = nbClients;
-        new Thread(employeBuffet).start();
-        cuisinier.start();
-
+        // Crée et démarre les clients
         for (int i = 1; i <= nbClients; i++) {
-            poolClients.submit(new Client(i, this));
+            Client client = new Client(i, this);
+            clients.add(client);
+            client.start();
         }
-        poolClients.shutdown(); // Arrêter le pool après tous les clients
+
+        // Démarre le cuisinier
+        cuisinier.start();
     }
 
-    public synchronized void entrer(Client client) throws InterruptedException {
-        while (placesOccupees >= CAPACITE_MAX) {
-            wait();
+    // Attendre la fin de tous les clients et du cuisinier
+    public void attendreFinSimulation() {
+        try {
+            // Attendre que tous les clients finissent
+            for (Client client : clients) {
+                client.join();
+            }
+
+            // Attendre que le cuisinier termine
+            cuisinier.interrupt(); // Arrêter le cuisinier
+            cuisinier.join();
+
+            afficherResume();  // Afficher le résumé final
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        placesOccupees++;
-        Logger.log("Client " + client.getClientId() + " entre dans le restaurant.");
     }
 
-    public synchronized void sortir(Client client) {
-        placesOccupees--;
-        clientsDansRestaurant.remove(client);
-        Logger.log("Client " + client.getClientId() + " quitte le restaurant.");
-        notifyAll();
+    // Méthode pour afficher le résumé de la simulation
+    private void afficherResume() {
+        System.out.println("\n=== Résumé Simulation ===");
+        System.out.println("Nombre total de clients servis : " + clients.size());
+        System.out.println("Nombre de plats cuits : " + totalPlatsCuits);
+        System.out.println("Consommation totale par compartiment :");
+        System.out.println("  - Légumes : " + totalLegumes + "g");
+        System.out.println("  - Viande : " + totalViande + "g");
+        System.out.println("  - Poisson : " + totalPoisson + "g");
+        System.out.println("  - Nouilles : " + totalNouilles + "g");
     }
 
-    public Buffet getBuffet() {
-        return buffet;
+    // Met à jour les statistiques de consommation chaque fois qu'un client se sert
+    public void consommer(Compartiment compartiment, int quantite) {
+        switch (compartiment) {
+            case LEGUMES:
+                totalLegumes += quantite;
+                break;
+            case VIANDE:
+                totalViande += quantite;
+                break;
+            case POISSON:
+                totalPoisson += quantite;
+                break;
+            case NOUILLES:
+                totalNouilles += quantite;
+                break;
+        }
     }
 
     public StandCuisson getStandCuisson() {
         return standCuisson;
     }
 
+    public Cuisinier getCuisinier() {
+        return cuisinier;
+    }
+
     public void incrementerPlatsCuits() {
-        totalPlatsCuits.incrementAndGet();
-    }
-
-    public synchronized void ajouterTempsAttenteBuffet(long temps) {
-        totalTempsAttenteBuffet += temps;
-    }
-
-    public int getTotalPlatsCuits() {
-        return totalPlatsCuits.get();
-    }
-
-    public long getTotalTempsAttenteBuffet() {
-        return totalTempsAttenteBuffet;
-    }
-
-    public int getTotalClients() {
-        return totalClients;
+        totalPlatsCuits++;
     }
 }
