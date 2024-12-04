@@ -2,14 +2,14 @@ package kone.nassara.m1.ccsr.wok;
 
 public class Buffet {
     private final int[] quantites = {
-        Compartiment.CAPACITY,
-        Compartiment.CAPACITY,
-        Compartiment.CAPACITY,
-        Compartiment.CAPACITY
+            Compartiment.CAPACITY,
+            Compartiment.CAPACITY,
+            Compartiment.CAPACITY,
+            Compartiment.CAPACITY
     };
     private int nombreReapprovisionnements = 0;
 
-    // Méthode pour afficher un compartiment sous forme de barre de progression
+    // MÃ©thode pour afficher un compartiment sous forme de barre de progression
     private String afficherBarreProgression(int quantite) {
         int pourcentage = (quantite * 100) / Compartiment.CAPACITY;
         return String.format("[%-100s] %d%%", "=".repeat(pourcentage), pourcentage);
@@ -23,11 +23,11 @@ public class Buffet {
             Logger.log(compartiment + ": " + afficherBarreProgression(quantites[index]));
             return true;
         }
-        Logger.log(compartiment + ": Quantité insuffisante. Attente...");
+        Logger.log(compartiment + ": QuantitÃ© insuffisante. Attente...");
         return false;
     }
 
-    // Réapprovisionner un compartiment
+    // RÃ©approvisionner un compartiment
     public synchronized void recharger(Compartiment compartiment) {
         int index = compartiment.ordinal();
         quantites[index] = Compartiment.CAPACITY;
@@ -35,7 +35,7 @@ public class Buffet {
         Logger.log(compartiment + ": " + afficherBarreProgression(quantites[index]));
     }
 
-    // Obtenir la quantité restante dans un compartiment
+    // Obtenir la quantitÃ© restante dans un compartiment
     public int getQuantite(Compartiment compartiment) {
         return quantites[compartiment.ordinal()];
     }
