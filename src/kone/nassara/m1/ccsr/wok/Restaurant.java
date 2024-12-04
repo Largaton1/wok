@@ -86,4 +86,9 @@ public class Restaurant {
     public void incrementerPlatsCuits() {
         totalPlatsCuits++;
     }
+
+	public Integer getPlatsCuits() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
